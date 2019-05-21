@@ -50,7 +50,8 @@ while(cap.isOpened()):
             if frame_num % 5 == 0:
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 gray_roi = gray[startY:endY, startX:endX]
-                cv2.imwrite('dataset/' + str(args['person']) + '/' + str(frame_num) + '.png', gray_roi)
+                print('dataset/' + args['person'] + '/' + str(frame_num) + '.png')
+                cv2.imwrite('dataset/' + args['person'] + '/' + str(frame_num) + '.png', gray_roi)
         # show the output frame
         cv2.imshow("Frame", frame)
         key = cv2.waitKey(1) & 0xFF
