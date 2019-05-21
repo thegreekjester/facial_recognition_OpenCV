@@ -19,23 +19,24 @@ x_train = []
 y_train = []
 # Looping through the files in the image_dir
 for root, dirs, files in os.walk(IMAGE_DIR):
-    for file in files: #for each file
+    for i,file in enumerate(files): #for each file
         if file.endswith('png') or file.endswith('jpg') or file.endswith('jpeg') or file.endswith('JPG'): #if it ends with .png or .jpg
             path = os.path.join(root, file) #print its path
             label = os.path.basename(root).replace(' ', '_').lower() # returns the directory that the image is in (to be used as a label)
 
             y_train.append(label) # put the label (dir name) into y train
             img = cv2.imread(path, 0)
-            faces = face_cascade.detectMultiScale(img, scaleFactor=1.5, minNeighbors=7)
+            
+            faces, rej_lvls, weights  = face_cascade.detectMultiScale3(img, scaleFactor=1.5, minNeighbors=7,outputRejectLevels=True)
             if len(faces) == 0:
-                print(path)
+                print('WWWWWHHHATTTTT THE FUCKKKKKKKKKKK')
             elif len(faces) > 1:
-                print('multiple {}'.format(faces))
-                faces = [faces[1]]
-            else:
-                print('just one: {}'.format(path))
+                max_conf = np.argmax(weights)
+                faces = [faces[max_conf]]
             for (x,y,w,h) in faces:
                 roi = img[y:y+h, x:x+w]
+                roi = cv2.resize(roi, (410,410))
+                cv2.imwrite('./train_images/' + label + str(i) + '_image.png', roi)
                 x_train.append(roi)
             
 
@@ -50,4 +51,4 @@ with open('labels.pickle', 'wb') as f:
     pickle.dump(label_ids, f)
 
 recognizer.train(x_train, y_train)
-recognizer.save('trainer.yml')
+recognizer.save('trainer_4.yml')

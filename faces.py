@@ -14,8 +14,10 @@ cap = cv2.VideoCapture(0)
 
 # This is the loading the face_cascade, make sure the path to .xml file is correct
 face_cascade = cv2.CascadeClassifier('cascades/data/haarcascade_frontalface_default.xml')
+# This loads the recognizer with info (trainer.yml) about the training
 recognizer = cv2.face.LBPHFaceRecognizer_create() # pylint: disable=no-member
-recognizer.read('trainer.yml')
+recognizer.read('trainer2.yml')
+
 while(True):
     # ret will be true as long as the video is connected 
     # frame is literally the frame at the current time
@@ -26,7 +28,6 @@ while(True):
 
     
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5) # iterable of tuples (x,y,w,h) of detected faces in the frame
-
     # grab the ROI (Region of interest) from faces
     for (x,y,w,h) in faces:
 
@@ -35,23 +36,18 @@ while(True):
         roi_gray = gray[y:y+h, x:x+w]
 
         roi_color = frame[y:y+h, x:x+w]
-        
-        id_,conf = recognizer.predict(roi_gray)
-        if conf >=45 and conf<=85:
-            print(labels[id_])
 
+        # The recognizer.predict method returns the ID from the pickle file as well as the uncertainty of the prediciton
+        id_, uncertainty = recognizer.predict(roi_gray)
+        print(uncertainty)
+        if uncertainty <60:
+            name = labels[id_]
 
-        img_item = 'my-image.png' # Setting the path of the image to be generated
-
-        # Write to the path you gave and the image is roi_gray (the face in last frame taken because cv2.imwrite just overwrites over and over)
-        cv2.imwrite(img_item, roi_gray)
-
-
-        #Drawing Rectangle
-        color = (255,0,0) #BGR because opencv is weird, 0-255
-        stroke = 2 #Thickness of line
-        cv2.rectangle(frame, (x,y), (x+w,y+h), color, stroke) # cv2.rectangle(frame, (start_x, start_y  of top left), (end_x, end_y of bottom right) )
-
+            #Drawing Rectangle
+            color = (255,0,0) #BGR because opencv is weird, 0-255
+            stroke = 2 #Thickness of line
+            cv2.rectangle(frame, (x,y), (x+w,y+h), color, stroke) # cv2.rectangle(frame, (start_x, start_y  of top left), (end_x, end_y of bottom right) )
+            cv2.putText(frame, name, (x,y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,0,255))
     # show the frame in a window that launches called "frame"
     cv2.imshow('frame', frame)
 
