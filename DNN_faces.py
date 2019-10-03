@@ -42,8 +42,9 @@ while(cap.isOpened()):
             (startX, startY, endX, endY) = box.astype("int")
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             roi_gray = gray[startY:endY, startX:endX]
-            id_, uncertainty = recognizer.predict(roi_gray)
-            print(uncertainty)
+            if roi_gray.shape[0] > 0 and roi_gray.shape[1] > 0:
+                id_, uncertainty = recognizer.predict(roi_gray)
+                print(uncertainty)
             if uncertainty <60:
                 name = labels[id_]
                 #Drawing Rectangle

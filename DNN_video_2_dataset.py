@@ -2,8 +2,9 @@ import cv2
 import numpy as np
 import argparse
 
+# Reading in the Caffe Model for Face Detection
 net = cv2.dnn.readNetFromCaffe('deploy.prototxt.txt', 'res10_300x300_ssd_iter_140000.caffemodel') # pylint: disable=no-member
-
+# target the webcam
 cap = cv2.VideoCapture(0)
 
 frame_num = 0
@@ -18,7 +19,9 @@ while(cap.isOpened()):
     ret, frame = cap.read()
 
     if ret == True:
+        # frame is (h,w,color_channels)
         [h, w] = frame.shape[:2]
+        
         blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), # pylint: disable=no-member
         1.0, (300, 300), (104.0, 177.0, 123.0)) 
         net.setInput(blob)
